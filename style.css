@@ -1,0 +1,66 @@
+#Cover section {
+    background-image: none;
+}
+#Cover h2 {
+    color: #444;
+    font-size:80px;
+    margin-bottom:120px;
+}
+#Cover img {
+    bottom: 60px;
+    position: absolute;
+    right: 150px;
+}
+#WhoAmI * {
+    color: #FFF;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, .8);
+}
+#WhoAmI header h2 {
+    background: none;
+    padding: 20px 0;
+    text-align: center;
+    width: 100%;
+}
+#WhoAmI section > ul {
+    font-size: 32px;
+    margin-top: 150px;
+}
+#WhoAmI section > ul > li:before {
+    color: rgba(255, 255, 255, .7);
+    font-size: 46px;
+    margin: 4px 0 0 -110px;
+}
+#StaticLanguages p, #DynamicLanguages p {
+    font-size: 30px;
+}
+#StaticLanguages2 p {
+    font-family: Menlo, monospace;
+    font-size: 20px;
+}
+#PicTwo h2 {
+    font-size: 100px;
+    margin-top: 14%;
+    text-align:center;
+}
+#Interfaces section > div {
+    margin-top: 80px;
+    text-align: center;
+}
+#CompilingXkcd h2 {
+    text-align: left;
+}
+#Concurrency section > img {
+    position: absolute;
+}
+#Concurrency section > img.first {
+    bottom: 20px;
+    left: 10px;
+}
+#Concurrency section > img:not(.first) {
+    right: 100px;
+    top: 60px;
+}
+#ThankYou section > div {
+    margin-top: 70px;
+    text-align: center;
+}

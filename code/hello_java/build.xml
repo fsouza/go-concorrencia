@@ -1,0 +1,27 @@
+<project name="hello" basedir=".">
+    <property name="src" location="src"/>
+    <property name="build" location="build"/>
+    <property name="classes" location="${build}/classes"/>
+    <property name="jar" location="${build}/jar"/>
+    <target name="setup">
+        <tstamp/>
+        <mkdir dir="${classes}"/>
+        <mkdir dir="${jar}"/>
+    </target>
+    <target name="build" depends="setup" description="compile the source">
+        <javac srcdir="${src}" destdir="${classes}" includeantruntime="false"/>
+    </target>
+    <target name="jar" depends="build">
+        <jar destfile="${jar}/Hello.jar" basedir="${classes}">
+            <manifest>
+                <attribute name="Main-Class" value="br.ufes.hello.Hello"/>
+            </manifest>
+        </jar>
+    </target>
+    <target name="run" depends="jar">
+        <java jar="${jar}/Hello.jar" fork="true"/>
+    </target>
+    <target name="clean">
+        <delete dir="${build}"/>
+    </target>
+</project>

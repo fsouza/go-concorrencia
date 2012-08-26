@@ -1,0 +1,751 @@
+<!DOCTYPE HTML>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>O modelo de concorrência da linguagem Go | Francisco Souza</title>
+    <meta name="viewport" content="width=1274, user-scalable=no">
+    <link rel="stylesheet" href="/themes/sc2/styles/style.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="list">
+    <div class="slide" id="Cover">
+        <div>
+            <section>
+                <header>
+                    <h2>O modelo de concorrência da Linguagem Go</h2>
+                </header>
+                <h3>Francisco Souza</h3>
+                <p>fss@souza.cc</p>
+                <div>
+                    <img src="pictures/gopher-talk.png" alt="Gopher">
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover w" id="WhoAmI">
+        <div>
+            <section>
+                <header>
+                    <h2>what the f**rancisco?!</h2>
+                </header>
+                <ul>
+                    <li>desenvolvedor @ globo.com</li>
+                    <li>open source fanboy</li>
+                    <li>Go, Python, web, cloud computing, etc.</li>
+                </ul>
+                <img src="pictures/go-python.jpg">
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="You">
+        <div>
+            <section>
+                <header>
+                    <h2>Vocês?</h2>
+                </header>
+                <ul class="build-list">
+                    <li>Java</li>
+                    <li>C/C++</li>
+                    <li>C#</li>
+                    <li>Python, Ruby, PHP, etc.</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="Tour">
+        <div>
+            <section>
+                <header>
+                    <h2><a href="http://tour.golang.org">tour.golang.org</a></h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover w" id="MaisUma">
+        <div>
+            <section>
+                <img src="pictures/diagram.png" alt="programming languages">
+                <div class="build overlay">
+                    <br><br>Mais uma?
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="WhyGo">
+        <div>
+            <section>
+                <header>
+                    <h2>Por que Go?</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="StaticLanguages">
+        <div>
+            <section>
+                <header>
+                    <h2>Linguagens estáticas</h2>
+                </header>
+                <p>Rápidas<span class="build">, mas...</span></p>
+                <div class="build">
+<pre class="build mark-code">
+package br.ufes.hello;
+
+<mark>public class Hello</mark> {
+
+    <mark>public static void</mark> main(String[] args) {
+        <mark>System.out.println</mark>("Hello, world!");
+    }
+
+}
+</pre>
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="StaticLanguages2">
+        <div>
+            <section>
+                <header>
+                    <h2>Linguagens estáticas</h2>
+                </header>
+                <p class="build code">
+                public static &lt;I, O&gt; ListenableFuture &lt;O&gt; chain(ListenableFuture&lt;I&gt; input, Function&lt;? super I, ? extends ListenableFuture&lt;? extends O&gt;&gt; function)
+                </p>
+            </section>
+        </div>
+    </div>
+    <div class="slide center" id="CompilingXkcd">
+        <div>
+            <section>
+                <header>
+                    <h2>Linguagens estáticas</h2>
+                </header>
+                <img src="pictures/compiling.png" alt="Compiling!">
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="PythonAndRuby">
+        <div>
+            <section>
+                <header>
+                    <h2>Python e Ruby #FTW!</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="DynamicLanguages">
+        <div>
+            <section>
+                <header>
+                    <h2>Linguagens dinâmicas</h2>
+                </header>
+                <p>Divertidas<span class="build">, pouco verbosas</span><span class="build">, mas...</span></p>
+<pre class="build build-code" style="height: 260px;">
+% cat compile.sh
+#!/bin/sh -e
+
+cc hello.c -o hello
+./hello
+% /usr/bin/time ./compile.sh
+Hello, world!
+        <mark>0.06 real</mark>         0.01 user         0.01 sys
+% /usr/bin/time ruby hello.rb
+Hello, world!
+        <mark>0.11 real</mark>         0.05 user         0.05 sys
+% /usr/bin/time python hello.py
+Hello, world!
+        <mark>0.03 real</mark>         0.02 user         0.00 sys
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="PicTwo">
+        <div>
+            <section>
+                <blockquote>“Speed, reliability, or simplicity: pick two. (sometimes just one)"</blockquote>
+                <header>
+                    <h2>Can't we do better?</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="GoFeatures">
+        <div>
+            <section>
+                <header>
+                    <h2>Características</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="Interfaces">
+        <div>
+            <section>
+                <header>
+                    <h2>Interfaces</h2>
+                </header>
+                <div>
+                    <img src="pictures/cartoon_duck.jpg" alt="Duck typing">
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="InterfaceDuck">
+        <div>
+            <section>
+<pre class="build-code">
+type Duck interface {
+    <mark>Quack()</mark>
+}
+</pre>
+<pre class="build">
+var duck Duck
+</pre>
+<pre class="build build-code">
+type Chicken struct {
+    name string
+}
+
+func (c Chicken) <mark>Quack()</mark> {
+    fmt.Printf("%s quacking...\n", c.name)
+}
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="ChickenDuck">
+        <div>
+            <section>
+                <header>
+                    <h2>Usando a interface</h2>
+                </header>
+<pre class="build mark-code">
+<mark class="another">var duck Duck</mark>
+var chicken Chicken
+duck <mark>= chicken
+duck.Quack()</mark>
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="TypeInference">
+        <div>
+            <section>
+                <header>
+                    <h2>Inferência de tipo</h2>
+                </header>
+                <ul>
+                    <li>
+                        Java
+<pre class="build">
+Integer i = new Integer(10);
+</pre>
+                    </li>
+                    <li>
+                        C/C++
+<pre class="build">
+int i = 10;
+</pre>
+                    </li>
+                    <li>
+                        Go
+<pre class="build">
+i := 10
+</pre>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="Slices">
+        <div>
+            <section>
+                <header>
+                    <h2>Slices</h2>
+                </header>
+                <p>"Arrays" dinâmicos.</p>
+<pre>
+numbers := []int{1, 2, 3}
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="Concurrency">
+        <div>
+            <section>
+                <header>
+                    <h2>Concorrência</h2>
+                </header>
+                <img src="pictures/run.png" alt="gopher running" class="first">
+                <img src="pictures/ref.png" alt="gopher book">
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="ConcurrencyMore">
+        <div>
+            <section>
+                <header>
+                    <h2>Concorrência</h2>
+                </header>
+                <p>Olhe à sua volta, o que você vê?</p>
+                <p class="build">Tarefas sendo executadas de maneira sequencial?</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="ConcurrencyVsParallelism">
+        <div>
+            <section>
+                <header>
+                    <h2>Concorrência, não paralelismo</h2>
+                </header>
+                <p>Apesar de serem conceitos relacionados, são coisas diferentes.</p>
+                <ul>
+                    <li><b>Concorrência:</b> lidar com várias coisas ao mesmo tempo;</li>
+                    <li><b>Paralelismo:</b> fazer várias coisas ao mesmo tempo.</li>
+                </ul>
+                <p class="build">Vamos falar sobre concorrência ;-)</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="CSP">
+        <div>
+            <section>
+                <header>
+                    <h2>Communicating Sequential Processes</h2>
+                </header>
+<pre>
+PROC producer (CHAN INT out!)
+    out ! 42
+:
+
+PROC consumer (CHAN INT in?)
+    INT v:
+    SEQ
+        in ? v
+:
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="CSPMappings">
+        <div>
+            <section>
+                <header>
+                    <h2>Communicating Sequential Processes</h2>
+                </header>
+                <ul>
+                    <li>Processo -> goroutine</li>
+                    <li>Canal -> canal</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="Sum">
+        <div>
+            <section>
+                <header>
+                    <h2>Somando inteiros</h2>
+                </header>
+<pre>
+func sum(numbers []int) {
+    var result int
+    for _, n := range numbers {
+        result += n
+    }
+    fmt.Println(result)
+}
+</pre>
+<pre class="build">
+func main() {
+    v := []int{1, 2, 3, 4, 5, 6}
+    sum(v)
+}
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="SumGoRoutine">
+        <div>
+            <section>
+                <header>
+                    <h2>Somando inteiros</h2>
+                </header>
+<pre class="build mark-code built">
+func sum(numbers []int) {
+    var result int
+    for _, n := range numbers {
+        result += n
+    }
+    fmt.Println(result)
+}
+</pre>
+<pre class="build mark-code built">
+func main() {
+    v := []int{1, 2, 3, 4, 5, 6}
+    <mark>go</mark> sum(v)
+}
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="SumGoRoutinChannel">
+        <div>
+            <section>
+                <header>
+                    <h2>Somando inteiros</h2>
+                </header>
+<pre class="build mark-code built">
+func sum(numbers []int, <mark>c chan&lt;- int</mark>) {
+    var result int
+    for _, n := range numbers {
+        result += n
+    }
+    <mark>c &lt;- result</mark>
+}
+</pre>
+<pre class="build mark-code">
+func main() {
+    v := []int{1, 2, 3, 4, 5, 6}
+    ch := <mark>make(chan int)</mark>
+    go sum(v, <mark>ch</mark>)
+    fmt.Println(<mark>&lt;-ch</mark>)
+}
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="SumGoRoutinChannelParallel">
+        <div>
+            <section>
+                <header>
+                    <h2>Somando inteiros</h2>
+                </header>
+<pre class="build mark-code built">
+func sum(numbers []int, c chan&lt;- int) {
+    var result int
+    for _, n := range numbers {
+        result += n
+    }
+    c &lt;- result
+}
+</pre>
+<pre class="build mark-code built">
+func main() {
+    v := []int{1, 2, 3, 4, 5, 6}
+    <mark>h := len(v) / 2</mark>
+    ch := make(chan int)
+    <mark>go sum(v[:h], ch)</mark>
+    <mark>go sum(v[h:], ch)</mark>
+    fmt.Println(<mark>&lt;-ch</mark> + <mark>&lt;-ch</mark>)
+}
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="MoreRealExample">
+        <div>
+            <section>
+                <header>
+                    <h2>Um exemplo mais real</h2>
+                </header>
+                <p>Dados replicados em múltiplos bancos de dados.</p>
+                <p class="build">Vamos enviar uma query para todas as réplicas e utilizar o primeiro resultado obtido.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="TheDatabase">
+        <div>
+            <section>
+                <header>
+                    <h2>O banco de dados</h2>
+                </header>
+                <p>Apenas uma tabela, <code>attendees</code>, com a seguinte estrutura:</p>
+<pre>
++--------+-------------+------+-----+---------+----------------+
+| Field  | Type        | Null | Key | Default | Extra          |
++--------+-------------+------+-----+---------+----------------+
+| id     | int(11)     | NO   | PRI | NULL    | auto_increment |
+| name   | varchar(50) | NO   |     | NULL    |                |
+| gender | char(1)     | NO   |     | NULL    |                |
++--------+-------------+------+-----+---------+----------------+
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="DBType">
+        <div>
+            <section>
+<pre style="margin-top: -30px;">
+type DB struct {
+    db *sql.DB
+}
+
+func (d *DB) query(q string, ch chan<- []Attendee) {
+    rows, err := d.db.Query(q)
+    if err != nil {
+        panic(err)
+    }
+    var attendees []Attendee
+    for rows.Next() {
+        var attendee Attendee
+        rows.Scan(&attendee.name, &attendee.gender)
+        attendees = append(attendees, attendee)
+    }
+    if err = rows.Err(); err != nil {
+        panic(err)
+    }
+    ch <- attendees
+}
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="MultipleQueries">
+        <div>
+            <section>
+                <header>
+                    <h2>Enviando a query</h2>
+                </header>
+<pre>
+func query(q string, dbs []DB) []Attendee {
+    ch := make(chan []Attendee, len(dbs))
+    for _, db := range dbs {
+        go db.query(q, ch)
+    }
+    return <-ch
+}
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="UsingTheQueryFunction">
+        <div>
+            <section>
+                <header>
+                    <h2>Usando a função <code>query</code></h2>
+                </header>
+<pre>
+func main() {
+    dbnames := []string{"db1", "db2", "db3", "db4", "db5"}
+    dbs := make([]DB, len(dbnames))
+    for i, name := range dbnames {
+        dbs[i] = connect(name)
+        defer dbs[i].close()
+    }
+    q := "select name, gender from attendees where gender = 'M'"
+    for _, a := range query(q, dbs) {
+        fmt.Println(a)
+    }
+}
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover w" id="FAIL">
+        <div>
+            <section>
+                <header>
+                    <h2 class="right">#fail</h2>
+                </header>
+                <img src="pictures/fail.jpg" alt="FAIL">
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="LB">
+        <div>
+            <section>
+                <header>
+                    <h2>Load Balancer</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="LB2">
+        <div>
+            <section>
+                <header>
+                    <h2>Load Balancer</h2>
+                </header>
+                <p>Ao invés de sempre enviar todas as queries para todos os bancos de dados, vamos criar um balanceador de carga que envia as queries para os bancos de dados menos ocupados.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="LB3">
+        <div>
+            <section>
+                <header>
+                    <h2>Load Balancer</h2>
+                </header>
+                <p>Para isso, precisaremos de algumas adaptações:</p>
+                <ul>
+                    <li>O tipo <code>DB</code> terá um atributo load;</li>
+                    <li>Vamos usar uma priority queue de <code>DB</code> ao invés de um slice;</li>
+                    <li>A query não será mais enviada para todos os bancos de dados.</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="AdaptedDB">
+        <div>
+            <section>
+<pre style="margin-top: -40px;">
+type DB struct {
+    db   *sql.DB
+    load int
+}
+
+func (d *DB) query(q string, ch chan&lt;- []Attendee) {
+    rows, err := d.db.Query(q)
+    if err != nil {
+        panic(err)
+    }
+    var attendees []Attendee
+    for rows.Next() {
+        var attendee Attendee
+        rows.Scan(&attendee.name, &attendee.gender)
+        attendees = append(attendees, attendee)
+    }
+    if err = rows.Err(); err != nil {
+        panic(err)
+    }
+    d.load--
+    ch &lt;- attendees
+}
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="DBPool">
+        <div>
+            <section>
+                <header>
+                    <h2>DBPool</h2>
+                </header>
+<pre>
+type DBPool []*DB
+
+func (p *DBPool) Less(i, j int) bool {
+    return (*p)[i].load < (*p)[j].load
+}
+
+...
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="Balancer">
+        <div>
+            <section>
+                <header>
+                    <h2>Balancer</h2>
+                </header>
+<pre>
+type Balancer struct {
+    pool DBPool
+}
+
+func NewBalancer(dbnames []string) Balancer {
+    lb := Balancer{make(DBPool, 0)}
+    for _, name := range dbnames {
+        db := connect(name)
+        heap.Push(&lb.pool, &db)
+    }
+    return lb
+}
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="Balancer2">
+        <div>
+            <section>
+                <header>
+                    <h2>Balancer [2]</h2>
+                </header>
+<pre>
+func (lb Balancer) query(q string) chan []Attendee {
+    db := heap.Pop(&lb.pool).(*DB)
+    ch := make(chan []Attendee)
+    go db.query(q, ch)
+    db.load++
+    heap.Push(&lb.pool, db)
+    return ch
+}
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="FinalMain">
+        <div>
+            <section>
+                <header>
+                    <h2>main</h2>
+                </header>
+<pre>
+func main() {
+    dbnames := []string{"db1", "db2", "db3", "db4", "db5"}
+    lb := NewBalancer(dbnames)
+    q := "select name, gender from attendees where name like 'A%'"
+    ch := lb.query(q)
+    for _, a := range <-ch {
+        fmt.Println(a)
+    }
+}
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="Conclusion">
+        <div>
+            <section>
+                <header>
+                    <h2>Conclusões</h2>
+                </header>
+                <ul class="build-list">
+                    <li>Go é uma linguagem produtiva \o/</li>
+                    <li>Nenhum semáforo, condition variables, ou outros mecanismos primitivos de sincronização</li>
+                    <li>Benefício da implementação de heap da biblioteca padrão (biblioteca padrão rocks)</li>
+                    <li>MySQL replicado mais feliz :) [load balancer facilmente implementado]</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout cover black" id="OneMoreThing">
+        <div>
+            <section>
+                <header>
+                    <h2>One more thing...</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover h" id="WorkAtGlobocom">
+        <div>
+            <section>
+                <img src="pictures/globocomtalentos.jpg" alt="Trabalhe na Globo.com">
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="ThankYou">
+        <div>
+            <section>
+                <header>
+                    <h2>Dúvidas? Obrigado!</h2>
+                </header>
+                <p>Francisco Souza<br>fss@souza.cc</p>
+                <ul>
+                    <li><a href="http://twitter.com/franciscosouza">twitter.com/franciscosouza</a></li>
+                    <li><a href="http://f.souza.cc">f.souza.cc</a></li>
+                </ul>
+                <div>
+                    <img src="pictures/globo.com.png" alt="Globo.com">
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="progress"><div></div></div>
+    <script src="/themes/scripts/script.js"></script>
+    <!-- Copyright © 2010–2012 Vadim Makeev — pepelsbey.net -->
+</body>
+</html>
